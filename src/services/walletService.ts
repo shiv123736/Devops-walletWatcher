@@ -1,36 +1,45 @@
-import pool from "../config/db";
-import { categoryModel, expenseModel} from "../models/walletModel";
 
+import { categoryModel, expenseModel} from "../models/walletModel";
+import prisma from "../utils/prisma";
 
 export const getCategoriesService = async () => {
-    const result =  await pool.query<categoryModel>('SELECT * FROM Category ORDER BY id ASC;');
-    return result.rows;
+    return await prisma.category.findMany({
+        orderBy: {
+            id: 'asc',
+        },
+    });
 }
 
 export const getExpensesService = async () => {
-    const result =  await pool.query<expenseModel>(
-        `SELECT 
-        e.Id,
-        e.Title, 
-        e.Amount, 
-        e.Date, 
-        c.Name AS Category_Name
-        FROM Expense e
-        JOIN Category c ON e.CategoryId = c.Id;`
-    );
-    return result.rows;
+    return await prisma.expense.findMany({
+        orderBy: {
+            id: 'asc',
+        },
+        include: {
+            category: true,
+        },
+    });
 }   
 
 
-export const addCategoryService = async (category: categoryModel): Promise<void> => {
-    const query = 'INSERT INTO Category (Name) VALUES ($1);';
-    const values = [category];
-    console.log("Executing Query:", query, "with values:", values);
-    await pool.query(query, values);
+export const addCategoryService = async (category: Omit<categoryModel, 'id'>): Promise<categoryModel> => {
+    return await prisma.category.create({
+        data: {
+            name: category.name,
+        },
+    });
 }
 
-export const addExpenseService = async (expense: expenseModel): Promise<void> => {
-    const query = 'INSERT INTO Expense (Title, Amount, CategoryId) VALUES ($1, $2, $3);';
-    const values = [expense.Title, expense.Amount, expense.CategoryId];
-    await pool.query(query, values);
+export const addExpenseService = async (expense: Omit<expenseModel, 'id'| 'date'>): Promise<expenseModel> => {
+    // 1. Create (Input and DB now match perfectly!)
+    const savedData = await prisma.expense.create({
+        data: {
+            title: expense.title,
+            amount: expense.amount,
+            categoryid: expense.categoryid, 
+        },
+    });
+    return savedData;
 }
+
+

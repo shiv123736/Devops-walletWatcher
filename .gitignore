@@ -14,3 +14,4 @@
 /.turbo
 /.next
 /out            
+/src/generated/prisma

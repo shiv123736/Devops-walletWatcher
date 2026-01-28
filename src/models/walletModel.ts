@@ -1,13 +1,14 @@
+// src/models/walletModel.ts
 
 export interface categoryModel {
-    Id: number;
-    Name: string;
-};
+    id: number;    
+    name: string;
+}
 
 export interface expenseModel {
-    Id: number;
-    Title: string;
-    Amount: number;
-    Date: Date;
-    CategoryId: number;
-};
+    id: number;       
+    title: string;
+    amount: number;
+    date: Date;       
+    categoryid: number; 
+}
