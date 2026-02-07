@@ -36,11 +36,17 @@ export const addCategory = async (req: Request, res: Response, next: NextFunctio
 
 export const addExpense = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const validation = expenseSchema.safeParse(req.body);
+        const payload = (req.body && (req.body.expense ?? req.body)) as any;
+        const normalized = {
+            title: payload.Title ?? payload.title,
+            amount: payload.Amount ?? payload.amount,
+            categoryid: payload.CategoryId ?? payload.categoryid,
+        };
+        const validation = expenseSchema.safeParse(normalized);
         if (!validation.success) {
             res.status(400).json({ errors: validation.error.issues });
             return;
-        }       
+        }
         const result = await addExpenseService(validation.data);
         res.status(201).json({ message: "Expense added successfully", expense: result });
     } catch (error) {

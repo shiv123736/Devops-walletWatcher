@@ -1,6 +1,8 @@
 import { Pool } from 'pg';
 
 const pool = new Pool({
+    // for production, it's better to use a single connection string for simplicity and compatibility with hosting providers    
+    connectionString: process.env.DATABASE_URL, // Use DATABASE_URL if available for easier deployment
     user: process.env.POSTGRES_USER,
     host: process.env.DB_HOST,
     database: process.env.POSTGRES_DB,

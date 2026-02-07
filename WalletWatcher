@@ -1,0 +1,68 @@
+The Project: WalletWatcher 💸
+Unlike the Todo app (which was just one table), this app will have two tables linked together. This will force you to practice Prisma Relations, which is a key backend skill.
+
+The Data Model (Schema)
+    Category: (e.g., "Food", "Travel", "Bills")
+        id: Int
+        name: String
+    Expense: (e.g., "Uber to Airport", $45.00)
+        id: Int
+        title: String
+        amount: Float
+        date: DateTime
+        categoryId: Int (Foreign Key linking to Category)
+
+Phase 1: Local Setup (The Foundation)
+    [done] Initialize project - npm init & TypeScript setup (tsconfig.json).(npm init, tsc --init, install express, pg, dotenv).
+    [done] Express Server running on port 3000.
+    [done] Create docker-compose.yml immediately to spin up a local PostgreSQL container.
+    [done] Connect to the DB using a tool (like DBeaver or VS Code SQLTools) to verify it's running.
+        
+Phase 1.1: The Manual Connection Pool
+    [done] Create a file src/db/pool.ts.
+    [done] Configure the Pool class explicitly (host, user, password, port).
+    [done] Critical Task: Set max: 10 (or similar) to explicitly define your pool size.
+    [done] Export a query function that uses this pool.
+
+Phase 2: The Logic (CRUD)
+    [done] Categories API:
+        POST /categories (Create "Food")
+        GET /categories (List all)
+    [done] Expenses API:
+        POST /expenses (Must include categoryId)
+        GET /expenses (List all)
+    [done] Bonus Logic: When getting expenses, use Prisma's include: { category: true } so the response shows "Food" instead of just ID 1.
+    
+Phase 3: Hardening
+    [done] Add /health endpoint.
+    [done] Add Graceful Shutdown (close Prisma connection).
+    [done] Add Centralized Error Handling.
+
+Phase 4: Validation (Zod)
+    [done] Create expense.schema.ts.
+    [done] Rule: amount must be a positive number (z.number().positive()).
+    [done] Rule: title must be at least 3 chars.
+    [done] Apply the middleware to your routes.
+
+Phase 5: Dockerization
+    [done] Write the Dockerfile (Don't forget the OpenSSL fix!).
+    [done] Write docker-compose.yml for local development (App + Postgres).
+    [done] Test: Run docker compose up and make sure you can add expenses via Postman.
+
+Phase 6: Cloud Deployment (GCP)
+    [ ] Provision a new VM on Google Cloud (or reuse the old one if you cleaned it up).
+    [ ] Install Docker on the VM.
+    [ ] Create gcp_deploy.yml (Remember the restart: always and healthcheck).
+    [ ] Challenge: Use the Nginx reverse proxy setup we discussed but didn't finish. Try to put Nginx in front of your API.
+
+Phase 7: CI/CD (GitHub Actions)
+    [ ] Create the .github/workflows/pipeline.yml.
+    [ ] Job 1: Lint & Test.
+    [ ] Job 2: Build & Push to Docker Hub.
+    [ ] Bonus: If you feel brave, try to set up Watchtower on the server to auto-update the app.
+
+
+Why this project?
+    Relations: You can't just delete a Category if it has Expenses inside it! (Prisma will throw an error). You have to handle that.
+    Numbers: Dealing with money (Floats/Decimals) in Zod and Prisma is slightly different than strings.
+    Real World: Every company has "Relationships" in their data.
